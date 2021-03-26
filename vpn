@@ -6,14 +6,13 @@
 
 TRAC_PATH="${TRAC_PATH-/Library/Application Support/Checkpoint/Endpoint Connect}"
 
-
 export PATH="$TRAC_PATH":"$PATH"
 
 security find-generic-password -g -a "${PASSWORD_ACCOUNT}" -w \
     | expect -c '
 expect_user "*\n"
 set pass $expect_out(buffer)
-spawn ./mock
+spawn trac connect
 expect "*Enter username:"
 send [exec printenv USER]
 send "\n"
