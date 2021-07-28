@@ -5,11 +5,14 @@
 #
 
 TRAC_PATH="${TRAC_PATH-/Library/Application Support/Checkpoint/Endpoint Connect}"
+PASSWORD_ACCOUNT=$(echo $USER | tr '[:lower:]' '[:upper:]')@AD.ING.NET
 
 export PATH="$TRAC_PATH":"$PATH"
 
-security find-generic-password -g -a "${PASSWORD_ACCOUNT}" -w \
-    | expect -c '
+case "$1" in
+    on)
+        security find-generic-password -g -a "${PASSWORD_ACCOUNT}" -w \
+            | expect -c '
 expect_user "*\n"
 set pass $expect_out(buffer)
 spawn trac connect
@@ -22,3 +25,19 @@ send "$pass"
 send "\n"
 expect eof
 '
+        system-proxy on
+        ;;
+    off)
+        trac disconnect
+        system-proxy off
+        ;;
+    *)
+        cat <<EOF
+Usage: $0 command
+
+Commands:
+  on
+  off
+EOF
+        ;;
+esac
